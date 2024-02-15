@@ -1,0 +1,106 @@
+/* Reset default browser styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f3ec; /* Soft beige background */
+    color: #333; /* Dark text color */
+    line-height: 1.6;
+}
+
+/* Container styles */
+.container {
+    /* display: flex;
+    justify-content: center; */
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Heading styles */
+h1, h2, h3 {
+    margin-bottom: 20px;
+    color: #974c02; /* Dark brown heading color */
+}
+
+/* Form styles */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #9c5915; /* Rusty orange button color */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #7d440f; /* Darker shade on hover */
+}
+
+/* Link styles */
+a {
+    color: #996633;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Footer styles */
+footer {
+    background-color: #996633;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 10px;
+}
+
+nav ul li a {
+    display: block;
+    float: left;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+nav li a:hover {
+    background-color: #240611; /* Background color on hover */
+}
+
+nav ul li {
+    display: inline; /* Display list items horizontally */
+    margin-right: 10px; /* Add spacing between list items */
+}
