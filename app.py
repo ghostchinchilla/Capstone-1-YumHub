@@ -1,46 +1,23 @@
 from flask import Flask, request, render_template, redirect, flash, session, url_for, jsonify
-import requests
-
-# from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-
-# generating secret_key
-
+from models import User, Recipe, Cuisine, Favorite,  db
+import requests
+import config
+import bcrypt
 import secrets
 import string
 
-def generate_secret_key(length=24):
-    alphabet = string.ascii_letters + string.digits + string.punctuation
-    secret_key = ''.join(secrets.choice(alphabet) for _ in range(length))
-    return secret_key
+app = Flask(__name__)
 
-# Generate a secret key of length 24
-secret_key = generate_secret_key()
-print("Generated Secret Key:", secret_key)
 
-app.config['SECRET_KEY'] = secret_key
-
-# !!!!!!!!!!!!!!!  append &apikey=1 to the end of your API requests
-
-#struggling with connecting to postgresql so actually start a database
-
-# ??????? app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///YumHub ' ????????
-
-db = SQLAlchemy()
-db.app=app
-# db.init_app(app)
-
-# BASE_URL = ('www.themealdb.com/api/json/v1/1/categories.php')
-# resp = requests.get(BASE_URL)
-# data = resp.json()
+app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
+app.config['SECRET_KEY'] = config.SECRET_KEY
 
 users = {}
 
 
 @app.route('/')
-# welcome message and login / signup form
+# Render the login form or homepage
 def home_page():
     return render_template('login.html')
 
@@ -48,81 +25,90 @@ def home_page():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # Handle form submission
-        username = request.form['username']
-        password = request.form['password']
-        # Additional form fields can be accessed similarly
+        # Retrieve form data
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm-password')
+        bio = request.form.get('bio')
 
-        # Perform validation (e.g., check if username is available, password meets criteria)
-        if username in users:
-            error = 'Username already exists. Please choose a different one.'
-            return render_template('register.html', error=error)
+        # Validate form data and ensure passwords match
+        if not username or not email or not password:
+            flash('Please fill in all required fields.', 'error')
+            return render_template('register.html')
 
-        # Create new user account
-        users[username] = {'password': password}
-        # Additional user data can be stored in the users dictionary
+        if password != confirm_password:
+            flash('Passwords do not match. Please try again.', 'error')
+            return render_template('register.html')
 
-        # Redirect to login page after successful registration
-        return redirect(url_for('login'))
-    else:
-        # Render registration form for GET requests
-        return render_template('register.html', error=None)
+        # Hash the password for secure storage
+        hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
-if __name__ == '__main__':
-    app.run(debug=True)
+        # Check if the username is unique
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists. Choose another.', 'error')
+            return render_template('register.html')
 
+        # Create a new user and add to the database
+        new_user = User(username=username, email=email, password=hashed_password, bio=bio)
+        db.session.add(new_user)  # Add the user to the database
+        db.session.commit()  # Commit the transaction
 
-@app.route('/profile', methods=['POST'])
-def create_user_profile():
-    username = request.form.get['username']
-    email = request.form.get['email']
-    password = request.form.get['password']
-    bio = request.form.get['bio']
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))  # Redirect to login page
 
-    # Validate form data (e.g., check for required fields, validate email format, etc.)
-    if not username or not email or not password:
-        # Handle missing required fields
-        error = 'Please fill in all required fields.'
-        return redirect(url_for('register', error=error))  # Redirect to registration page with error message
-
-    # Store the user profile (assuming user_profiles is a dictionary)
-    users[username] = {'email': email, 'password': password, 'bio': bio}
-
-    # Redirect to the user's profile page
-    return redirect(url_for('profile', username=username))
-
-
-@app.route('/profile/<username>')
-def profile(username):
-    user_profile = users.get(username)
-    if user_profile:
-        return render_template('profile.html', user=user_profile)
-    else:
-        # Assuming you have an error template to display user not found message
-        return render_template('error.html', message="User not found")
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    # Render the registration form for GET requests
+    return render_template('register.html')
     
 
+# Example dictionary for users (ideally, use a database)
+users = {
+    'john_doe': bcrypt.hashpw(b'secure_password', bcrypt.gensalt())  # Store password as a hash
+}
 
-
+# Route to handle user login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        # Retrieve form data
+        username = request.form.get('username')
+        password = request.form.get('password')
 
-        if username in users and users[username] == password:
-            # Authentication successful, redirect to a different page
-            return redirect(url_for('profile', username=username))
+        # Retrieve the user from the database by username
+        user = User.query.filter_by(username=username).first()
+
+        if user and bcrypt.checkpw(password.encode(), user.password):  # Check if the password matches
+            session['username'] = user.username  # Set session variable
+            return redirect(url_for('profile', username=user.username))  # Redirect to user profile
         else:
-            # Authentication failed, show error message
-            error = 'Invalid username or password. Please try again.'
-            return render_template('login.html', error=error)
-    else:
-        # Render the login form for GET requests
-        return render_template('login.html', error=None)
+            flash('Invalid username or password. Please try again.', 'error')
+            return render_template('login.html')  # Return with error message
+
+    return render_template('login.html')  # Render login form for GET requests
+    
+
+@app.route('/profile/<username>', methods=['GET', 'POST'])
+def manage_profile(username):
+    # Retrieve user data from the database
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return "User not found", 404  # Handle missing user profile
+
+    if request.method == 'POST':
+        # Handle profile update
+        email = request.form.get('email')
+        bio = request.form.get('bio')
+
+        # Update user information in the database
+        user.email = email
+        user.bio = bio
+        db.session.commit()  # Commit the changes to the database
+
+        flash('Profile updated successfully.', 'success')
+
+    # Render the profile page
+    return render_template('user_profile.html', username=username, user_profile=user)  # Pass the user profile data
 
 
     

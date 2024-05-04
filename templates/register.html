@@ -1,34 +1,32 @@
 {% extends 'base.html' %}
 {% block content %} 
 
-        <!-- <h1>Registation Page</h1> -->
-        <div class="container">
-            <h1>Register</h1>
-            <form action="/user_profile" methods=['GET', 'POST']>
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirm-password">Confirm Password:</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
-                </div>
-                <div class="form-group">
-                    <label for="bio">Bio:</label>
-                    <input type="text" id="bio" name="bio">
-                </div>
-                <button type="submit">Register</button>
-            </form>
-            <p>Already have an account? <a href="/login">Login here</a></p>
+<div class="container">
+    <h1>Register</h1>
+    <form action="/user_profile" method="post">  <!-- Use POST method -->
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
         </div>
-        
-        <!-- <script src="" async defer></script> -->
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm-password" required>
+        </div>
+        <div class="form-group">
+            <label for="bio">Bio:</label>
+            <textarea id="bio" name="bio"></textarea>  <!-- Use textarea for bio -->
+        </div>
+        <button type="submit">Register</button>  <!-- Submit button -->
+    </form>
+    <p>Already have an account? <a href="/login">Login here</a></p>  <!-- Link to login page -->
+</div>
+
 {% endblock %}

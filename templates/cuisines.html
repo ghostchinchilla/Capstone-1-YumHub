@@ -1,8 +1,23 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
+
 {% block content %} 
 
-<h1>Hi, this is the cuisines page</h1>>
+<h1>Welcome to the Cuisines Page</h1> 
 
-<ul id="cuisines-list"></ul>
+<p>Select a cuisine from the list below to see available meals:</p>
 
-{% endblock %}
+<!-- Dropdown to select a cuisine, filled dynamically by JavaScript -->
+<div class="dropdown-container">  <!-- This is where you place the dropdown -->
+    <!-- Dropdown to be centered -->
+    <select id="category-select">
+        <option value="">Select a Category</option>
+        <!-- Additional options populated by JavaScript -->
+    </select>
+</div>
+
+<!-- List of meals rendered based on the selected cuisine -->
+<ul id="meal-list">
+    <!-- JavaScript will append list items here -->
+</ul>
+
+{% endblock %}  # End of content block

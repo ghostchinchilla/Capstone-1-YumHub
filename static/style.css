@@ -124,3 +124,36 @@ h1 {
     text-align: center;
 }
 
+#categorty-select {
+    /* width: 100px;  
+    height: 30px; 
+    padding: 5px; */
+    border: 1px solid #ccc; 
+    background-color: white; 
+    color: #333;  
+    font-size: 16px;  
+    font-family: Arial, sans-serif;  
+} 
+
+
+.dropdown-container {
+    display: flex;  /* Use flex layout */
+    justify-content: center;  /* Center content horizontally */
+    align-items: center;  /* Center content vertically */
+    height: 10vh;  
+}
+
+p {
+    text-align: center;
+}
+
+#meal-list li {
+    padding: 10px;  /* Add padding */
+    border-bottom: 1px solid #ccc;  /* Border between items */
+    transition: background-color 0.3s;  /* Smooth transition for hover */
+}
+
+/* Hover effect for list items */
+#meal-list li:hover {
+    background-color: #f0f0f0;  /* Change background on hover */
+}
